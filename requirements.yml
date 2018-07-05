@@ -2,4 +2,3 @@
 - src: cloudalchemy.prometheus
 - src: cloudalchemy.grafana
 - src: rossmcdonald.influxdb
-- src: elastic.elasticsearch
