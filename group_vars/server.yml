@@ -1,0 +1,86 @@
+# netdata config vars
+netdata_registry_enabled: true
+netdata_registry_to_announce: "http://{{ ansible_fqdn }}:{{ netdata_default_port }}"
+pri_domain_name: corp.justin-tech.com
+netdata_stream_enabled: true
+netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"
+netdata_alarm_configure: true
+netdata_alarm_notify_configs: {
+  DISCORD_WEBHOOK_URL: "{{ vault_discord_webhook_url }}",
+  DEFAULT_RECIPIENT_DISCORD: "notifications"
+}
+netdata_configure_archive: true
+netdata_archive_enabled: 'yes'
+netdata_archive_type: 'opentsdb'
+netdata_archive_destination:
+  - "localhost:4242"
+# prometheus config vars
+prometheus_scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+  - job_name: "netdata_dashboard"
+    metrics_path: "/api/v1/allmetrics"
+    params:
+      format: [ prometheus_all_hosts ]
+    honor_labels: true
+    static_configs:
+      - targets: [ 'dashboard.corp.justin-tech.com:19999' ]
+prometheus_global: {
+  scrape_interval: 10s,
+  evaluation_interval: 10s
+}
+# influxdb config vars
+influxdb_opentsdb_enabled: "true"
+# grafana config vars
+grafana_security: {
+  admin_user: admin,
+    admin_password: "{{ vault_grafana_admin_pass }}"
+}
+grafana_smtp: {
+  host: "smtp.office365.com:587",
+  user: "{{ vault_grafana_smtp_user }}",
+  password: "{{ vault_grafana_smtp_password }}",
+  from_address: "{{ vault_grafana_smtp_from_address }}"
+}
+grafana_plugins:
+  - raintank-worldping-app
+  - alexanderzobnin-zabbix-app
+  - grafana-worldmap-panel
+  - michaeldmoore-annunciator-panel
+  - digiapulssi-breadcrumb-panel
+  - cloudflare-app
+  - jdbranham-diagram-panel
+  - grafana-kubernetes-app
+  - blackmirror1-singlestat-math-panel
+grafana_alert_notifications:
+  - name: "Email Alert"
+    type: "email"
+    isDefault: true
+    settings:
+      addresses: "{{ vault_grafana_alert_email }}"
+  - name: "Discord"
+    type: "discord"
+    isDefault: true
+    settings:
+      uploadImage: true
+      url: "{{ vault_discord_webhook_url }}"
+grafana_datasources:
+  - name: "Prometheus"
+    type: "prometheus"
+    access: "proxy"
+    url: "http://localhost:9090"
+    basicAuth: false
+    isDefault: true
+  - name: "InfluxDB-OpenTSDB"
+    type: "influxdb"
+    access: "proxy"
+    url: "http://localhost:8086"
+    basicAuth: false
+    database: "opentsdb"
+grafana_dashboards:
+  - dashboard_id: '6820'
+    revision_id: '1'
+    datasource: 'InfluxDB-OpenTSDB'

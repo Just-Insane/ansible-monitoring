@@ -1,65 +1,16 @@
 - hosts: server
   vars_files:
     - group_vars/vault.yml
-  vars:
-    netdata_registry_enabled: true
-    netdata_registry_to_announce: "http://{{ ansible_fqdn }}:{{ netdata_default_port }}"
-    pri_domain_name: corp.justin-tech.com
-    netdata_stream_enabled: true
-    netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"
-    netdata_alarm_configure: true
-    netdata_alarm_notify_configs: {
-      DISCORD_WEBHOOK_URL: "{{ vault_discord_webhook_url }}",
-      DEFAULT_RECIPIENT_DISCORD: "notifications"
-    }
-    netdata_configure_archive: true
-    netdata_archive_enabled: 'yes'
-    netdata_archive_type: 'opentsdb'
-    netdata_archive_destination:
-      - "localhost:4242"
-    prometheus_scrape_configs:
-      - job_name: "prometheus"
-        metrics_path: "{{ prometheus_metrics_path }}"
-        static_configs:
-          - targets:
-              - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
-      - job_name: "netdata_dashboard"
-        metrics_path: "/api/v1/allmetrics"
-        params:
-          format: [ prometheus_all_hosts ]
-        honor_labels: true
-        static_configs:
-          - targets: [ 'dashboard.corp.justin-tech.com:19999' ]
-    prometheus_global: {
-      scrape_interval: 10s,
-      evaluation_interval: 10s
-    }
-    grafana_security: {
-      admin_user: admin,
-      admin_password: "{{ vault_grafana_admin_pass }}"
-    }
-    influxdb_opentsdb_enabled: "true"
-    influxdb_opentsdb_database: netdata_opentsdb
+    - group_vars/server.yml
   roles:
     - mrlesmithjr.netdata
     - cloudalchemy.prometheus
-    - cloudalchemy.grafana
     - rossmcdonald.influxdb
+    - cloudalchemy.grafana
 
 - hosts: client
   vars_files:
     - group_vars/vault.yml
-  vars:
-    netdata_registry_enabled: false
-    netdata_registry_to_announce: "http://{{ netdata_stream_master_node }}:{{ netdata_default_port }}"
-    pri_domain_name: corp.justin-tech.com
-    netdata_stream_enabled: true
-    netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"
-    netdata_stream_master_node: dashboard.corp.justin-tech.com
-    netdata_alarm_configure: false
-    netdata_alarm_notify_configs: {
-      DISCORD_WEBHOOK_URL: "{{ vault_discord_webhook_url }}",
-      DEFAULT_RECIPIENT_DISCORD: "notifications"
-    }
+    - group_vars/client.yml
   roles:
     - mrlesmithjr.netdata
