@@ -56,7 +56,6 @@
     netdata_stream_enabled: true
     netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"
     netdata_stream_master_node: dashboard.corp.justin-tech.com
-    # netdata_alarm_configure: true
     netdata_alarm_configure: false
     netdata_alarm_notify_configs: {
       DISCORD_WEBHOOK_URL: "{{ vault_discord_webhook_url }}",
