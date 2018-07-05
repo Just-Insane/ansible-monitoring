@@ -12,6 +12,11 @@
       DISCORD_WEBHOOK_URL: "{{ vault_discord_webhook_url }}",
       DEFAULT_RECIPIENT_DISCORD: "notifications"
     }
+    netdata_configure_archive: true
+    netdata_archive_enabled: 'yes'
+    netdata_archive_type: 'opentsdb'
+    netdata_archive_destination:
+      - "localhost:4242"
     prometheus_scrape_configs:
       - job_name: "prometheus"
         metrics_path: "{{ prometheus_metrics_path }}"
@@ -33,10 +38,13 @@
       admin_user: admin,
       admin_password: "{{ vault_grafana_admin_pass }}"
     }
+    influxdb_opentsdb_enabled: "true"
+    influxdb_opentsdb_database: netdata_opentsdb
   roles:
     - mrlesmithjr.netdata
     - cloudalchemy.prometheus
     - cloudalchemy.grafana
+    - rossmcdonald.influxdb
 
 - hosts: client
   vars_files:
@@ -48,7 +56,8 @@
     netdata_stream_enabled: true
     netdata_stream_api_key: "{{ vault_netdata_stream_api_key }}"
     netdata_stream_master_node: dashboard.corp.justin-tech.com
-    netdata_alarm_configure: true
+    # netdata_alarm_configure: true
+    netdata_alarm_configure: false
     netdata_alarm_notify_configs: {
       DISCORD_WEBHOOK_URL: "{{ vault_discord_webhook_url }}",
       DEFAULT_RECIPIENT_DISCORD: "notifications"

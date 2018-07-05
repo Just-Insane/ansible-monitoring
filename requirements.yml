@@ -1,3 +1,5 @@
 - src: mrlesmithjr.netdata
 - src: cloudalchemy.prometheus
 - src: cloudalchemy.grafana
+- src: rossmcdonald.influxdb
+- src: cyverse-ansible.elastic-stack-install
