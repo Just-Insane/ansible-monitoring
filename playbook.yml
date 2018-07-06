@@ -6,6 +6,7 @@
     - mrlesmithjr.netdata
     - cloudalchemy.prometheus
     - rossmcdonald.influxdb
+    - telegraf
     - cloudalchemy.grafana
 
 - hosts: client

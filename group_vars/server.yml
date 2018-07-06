@@ -80,7 +80,18 @@ grafana_datasources:
     url: "http://localhost:8086"
     basicAuth: false
     database: "opentsdb"
+  - name: "InfluxDB-Telegraf"
+    type: "influxdb"
+    access: "proxy"
+    url: "http://localhost:8086"
+    database: "telegraf"
 grafana_dashboards:
   - dashboard_id: '6820'
     revision_id: '1'
     datasource: 'InfluxDB-OpenTSDB'
+  - dashboard_id: '1756'
+    revision_id: '1'
+    datasource: 'InfluxDB-Telegraf'
+  - dashboard_id: '1486'
+    revision_id: '4'
+    datasource: 'InfluxDB-Telegraf'

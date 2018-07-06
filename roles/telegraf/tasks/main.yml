@@ -1,0 +1,61 @@
+- name: Install Telegraf
+  yum:
+    name: telegraf
+    state: latest
+
+- name: Install net-snmp
+  yum:
+    name: net-snmp
+    state: latest
+
+- name: Install net-snmp-utils
+  yum:
+    name: net-snmp-utils
+    state: latest
+
+- name: Start and enable Telegraf
+  systemd:
+    name: telegraf
+    state: started
+    enabled: yes
+
+- name: Create InfluxDB Database
+  influxdb_database:
+      hostname: "localhost"
+      database_name: "telegraf"
+      state: present
+
+# Example in files/UBNT-MIB
+- name: Download UBNT-MIB
+  get_url:
+    url: http://dl.ubnt-ut.com/snmp/UBNT-MIB
+    dest: /usr/share/snmp/mibs/UBNT-MIB
+    mode: 0644
+
+# Example in files/UBNT-UniFi-MIB
+- name: Download UBNT-UniFi-MIB
+  get_url:
+    url: http://dl.ubnt-ut.com/snmp/UBNT-UniFi-MIB
+    dest: /usr/share/snmp/mibs/UBNT-UniFi-MIB
+    mode: 0644
+
+# Example in files/FROGFOOT-RESOURCES-MIB.mib
+- name: Download FROGFOOT-RESOURCES-MIB
+  get_url:
+    url: http://www.circitor.fr/Mibs/Mib/F/FROGFOOT-RESOURCES-MIB.mib
+    dest: /usr/share/snmp/mibs/FROGFOOT-RESOURCES-MIB
+    mode: 0644
+
+# Examples here: https://github.com/WaterByWind/grafana-dashboards
+# modified telegraf.conf to support UBNT-Edgerouter and UBNT-UAP
+- name: Copy vault encrypted conf file
+  copy:
+    src: files/telegraf.conf.vault
+    dest: /etc/telegraf/telegraf.conf
+    owner: root
+    group: root
+    backup: yes
+    force: yes
+    mode: 0644
+  notify:
+    - restart telegraf
